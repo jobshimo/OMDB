@@ -27,6 +27,7 @@ function App() {
     search()
   }, [goSearch, page])
 
+
   const handleText = (event) => {
     if (event.target.value.trim() === '') {
       setDisabled(true)
@@ -35,7 +36,7 @@ function App() {
     setDisabled(false)
     setTextInput(event.target.value.trim())
   }
-
+  
   const handleSearch = () => {
     setPage(1)
     setGoSearch(true)

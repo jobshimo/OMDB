@@ -5,6 +5,7 @@ import Search from './components/Search'
 
 function App() {
   const [searchResult, setSearchResult] = useState()
+  const [disabled, setDisabled] = useState(true)
   const [page, setPage] = useState(1)
   const [textInput, setTextInput] = useState('king')
   const url = `http://www.omdbapi.com/?apikey=a461e386&s=${textInput}&page=${page}`
@@ -33,14 +34,21 @@ function App() {
     search()
   }, [page])
 
+
   const handleText = (event) => {
-    setTextInput(event.target.value)
+    if (event.target.value.trim() === '') {
+      setDisabled(true)
+      return
+    }
+    setDisabled(false)
+    setTextInput(event.target.value.trim())
   }
 
   const handleSearch = async () => {
     setPage(1)
     const result = await callAPI()
     if (result && result.Response === "True") {
+      setDisabled(false)
       setSearchResult(result)
       return
     }
@@ -53,7 +61,7 @@ function App() {
 
   return (
     <div className="App">
-      <Search handleSearch={handleSearch} handleText={handleText} />
+      <Search handleSearch={handleSearch} handleText={handleText} disabled={disabled}/>
       {!searchResult
         ? (<p>No results yet</p>)
         : (
