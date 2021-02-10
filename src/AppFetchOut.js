@@ -5,40 +5,46 @@ import Search from './components/Search'
 
 function App() {
   const [searchResult, setSearchResult] = useState()
-  const [disabled, setDisabled] = useState(true)
   const [page, setPage] = useState(1)
   const [textInput, setTextInput] = useState('king')
-  const [goSearch, setGoSearch] = useState(false)
   const url = `http://www.omdbapi.com/?apikey=a461e386&s=${textInput}&page=${page}`
+
+  const callAPI = async () => {
+    try {
+      const response = await fetch(url)
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   useEffect(() => {
     const search = async () => {
-      const response = await fetch(url)
-      const data = await response.json()
-      if (data && data.Response === "True") {
-        setSearchResult(data)
+      const result = await callAPI()
+      if (result && result.Response === "True") {
+        setSearchResult(result)
         return
       } else {
         setSearchResult()
         return
       }
     }
-    setGoSearch(false)
     search()
-  }, [goSearch, page])
+  }, [page])
 
   const handleText = (event) => {
-    if (event.target.value.trim() === '') {
-      setDisabled(true)
-      return
-    }
-    setDisabled(false)
-    setTextInput(event.target.value.trim())
+    setTextInput(event.target.value)
   }
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     setPage(1)
-    setGoSearch(true)
+    const result = await callAPI()
+    if (result && result.Response === "True") {
+      setSearchResult(result)
+      return
+    }
+
   }
 
   const handlePage = (e) => {
@@ -47,7 +53,7 @@ function App() {
 
   return (
     <div className="App">
-      <Search handleSearch={handleSearch} handleText={handleText} disabled={disabled} />
+      <Search handleSearch={handleSearch} handleText={handleText} />
       {!searchResult
         ? (<p>No results yet</p>)
         : (
